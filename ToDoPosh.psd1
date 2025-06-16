@@ -9,7 +9,7 @@
 @{
 
 # Script module or binary module file associated with this manifest.
-# RootModule = ''
+RootModule = 'ToDoPosh.psm1'
 
 # Version number of this module.
 ModuleVersion = '0.0.1'
@@ -24,13 +24,13 @@ GUID = '694a925f-690f-4284-b8d0-d84c07871ac0'
 Author = 'danma'
 
 # Company or vendor of this module
-CompanyName = 'Unknown'
+CompanyName = 'MayerMediaCo.'
 
 # Copyright statement for this module
 Copyright = '(c) danma. All rights reserved.'
 
 # Description of the functionality provided by this module
-# Description = ''
+Description = 'An implementation of the todo.txt cli, written in powershell.'
 
 # Minimum version of the PowerShell engine required by this module
 # PowerShellVersion = ''
