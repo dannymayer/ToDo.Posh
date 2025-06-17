@@ -1,4 +1,4 @@
-function Add-TodoTask
+function Add-Todo
 {
   <#
     .SYNOPSIS
@@ -77,3 +77,4 @@ function Add-TodoTask
   return $task
 }
 
+Export-ModuleMember -Function Add-ToDo
