@@ -1,4 +1,4 @@
-function Load-SettingsFromFile
+function Import-ConfigSettings
 {
   <#
     .SYNOPSIS
