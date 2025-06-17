@@ -27,7 +27,7 @@ function Get-ModuleSetting
   )
 
   # Default in-memory settings
-  $settings = @{
+  $defaultSettings = @{
     DateOnAdd           = $true         # Automatically prepend creation date to new tasks
     DefaultPriority     = ''            # Empty = no default priority; otherwise use A, B, etc.
     TaskFilePath        = "$env:TODO_DIR\todo.txt"
@@ -41,16 +41,26 @@ function Get-ModuleSetting
     EnableProjectIndex  = $true         # Enable tagging of +projects and @contexts
   }
 
-  $key = $Name.ToLowerInvariant()
-  $match = $settings.Keys | Where-Object { $_.ToLowerInvariant() -eq $key }
+  # Initialize override dictionary if needed
+  if (-not $script:ToDoSettings)
+  {
+    $script:ToDoSettings = @{}
+  }
 
+  $key = $Name.ToLowerInvariant()
+  $match = $script:ToDoSettings.Keys | Where-Object { $_.ToLowerInvariant() -eq $key }
   if ($match)
   {
-    return $settings[$match]
-  } else
-  {
-    Write-Warning "Unknown setting: $Name"
-    return $null
+    return $script:ToDoSettings[$match]
   }
+
+  $match = $defaultSettings.Keys | Where-Object { $_.ToLowerInvariant() -eq $key }
+  if ($match)
+  {
+    return $defaultSettings[$match]
+  }
+
+  Write-Warning "Unknown setting: $Name"
+  return $null
 }
 
