@@ -44,6 +44,30 @@ Add-Todo -Text "Read the todo.txt spec" -Priority A
 Adds a new task to your configured `todo.txt` file. If `DateOnAdd` is enabled,
 the task is prepended with today’s date.
 
+### ⚙️ Configure a Setting
+
+```powershell
+Set-ModuleSetting -Name 'BackupOnWrite' -Value $false
+```
+
+Overrides a runtime setting.
+
+### 🔄 Load Settings from File
+
+```powershell
+Load-SettingsFromFile -Path "$env:TODO_DIR\config.json"
+```
+
+Loads your personal or team config from disk.
+
+### 🆕 Initialize Default Config
+
+```powershell
+Initialize-TodoConfig -Force
+```
+
+Writes a default JSON config template at the target location.
+
 ---
 
 ## ⚙️ Configuration
@@ -88,13 +112,14 @@ ToDoPosh/
 ## 🧭 Roadmap
 
 * [x] Add task (`Add-Todo`)
-* [ ] Complete task
-* [ ] Delete task
-* [ ] Modify task
-* [ ] List and filter tasks
-* [ ] `Set-ModuleSetting` support
-* [ ] Persistent configuration via JSON/INI
-* [ ] Alias management and tab completion
+* [x] Runtime configuration engine (`Get/Set-ModuleSetting`)
+* [x] JSON-based config load/save (`Load-SettingsFromFile`, `Initialize-TodoConfig`)
+* [x] Read todo.txt into objects (`Read-ToDoFile`)
+* [ ] Write todo.txt safely (`Write-ToDoFile`)
+* [ ] Complete/Delete/Update tasks
+* [ ] Publish to Powershell Gallery
+* [ ] Search, sort, group, and report tasks
+* [ ] Tab completion, profile helpers, and aliases
 
 ---
 
