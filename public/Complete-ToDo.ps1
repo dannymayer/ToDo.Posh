@@ -43,6 +43,7 @@ function Complete-Todo
   # Remove any duplicate completion tags if already completed
   $task.Raw = $task.Raw -replace '^x \d{4}-\d{2}-\d{2} x ', 'x '
 
+  $archived = $false
   if (Get-ModuleSetting -Name 'ArchiveOnComplete')
   {
     $donePath = Get-ModuleSetting -Name 'DoneFilePath'
@@ -51,16 +52,31 @@ function Complete-Todo
       New-Item -ItemType File -Path $donePath -Force | Out-Null
     }
     Add-Content -Path $donePath -Value $task.Raw
+    $archived = $true
     $tasks = $tasks | Where-Object { $_.LineNumber -ne $LineNumber }
   }
 
-  Write-TodoFile -Tasks $tasks -Path $FilePath
+  # Re-index line numbers
+  $tasks = $tasks | Sort-Object LineNumber
+  $index = 1
+  foreach ($t in $tasks)
+  {
+    $t.LineNumber = $index++
+  }
+
+  if ($tasks.Count -gt 0)
+  {
+    Write-TodoFile -Tasks $tasks -Path $FilePath
+  } else
+  {
+    Clear-Content -Path $FilePath
+  }
 
   [PSCustomObject]@{
     Status    = 'Completed'
     Task      = $task.Raw
     Line      = $LineNumber
-    Archived  = (Get-ModuleSetting -Name 'ArchiveOnComplete')
+    Archived  = $archived
     FilePath  = $FilePath
   }
 }
