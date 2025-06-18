@@ -3,78 +3,74 @@ function Add-Todo
   <#
     .SYNOPSIS
     Adds a new task to the todo.txt file.
-    .DESCRIPTION
-    This cmdlet constructs a new task from the provided text, optionally prepending the creation date (if enabled),
-    validates the task object, reads the existing todo list, appends the new task, and writes it back.
-    .PARAMETER Text
-    The text of the task to add (including any "+project", "@context", "(A)" priority, etc.).
-    .OUTPUTS
-    PSCustomObject representing the added task, with properties: Raw, LineNumber, FilePath.
-    .EXAMPLE
-    Add-Todo -Text "Buy milk +Groceries @Store"
-    #>
 
+    .DESCRIPTION
+    Appends a formatted task string to the configured task file. Supports optional metadata like priority and automatic date prefixing.
+
+    .PARAMETER Text
+    The text of the task.
+
+    .PARAMETER Priority
+    Optional priority (A-Z).
+
+    .EXAMPLE
+    Add-Todo -Text "Call mom @phone +Family" -Priority A
+
+    .NOTES
+    Honors DateOnAdd and BackupOnWrite settings.
+    #>
   [CmdletBinding()]
   param (
     [Parameter(Mandatory)]
-    [string]$Text
+    [string]$Text,
+
+    [ValidatePattern("^[A-Z]$")]
+    [string]$Priority
   )
 
-  # Resolve the path to todo.txt
-  $todoPath = Get-TodoFilePath -FileName 'todo.txt'
-  if (-not $todoPath)
+  $taskFile = Get-ModuleSetting -Name 'TaskFilePath'
+  $dateOnAdd = Get-ModuleSetting -Name 'DateOnAdd'
+  $backup = Get-ModuleSetting -Name 'BackupOnWrite'
+
+  if (-not (Test-Path $taskFile))
   {
-    Write-Error "Could not determine path to todo.txt"
-    return
+    New-Item -ItemType File -Path $taskFile -Force | Out-Null
   }
 
-  # Optionally prepend date
-  if ($PSBoundParameters.DateOnAdd -or (Get-ModuleSetting -Name 'DateOnAdd'))
-  { 
-    $date = (Get-Date).ToString('yyyy-MM-dd')
-    $raw = "$date $Text"
-  } else
+  if ($backup)
   {
-    $raw = $Text
+    Copy-Item -Path $taskFile -Destination "$taskFile.bak" -Force
   }
 
-  # Build task object
-  $task = [PSCustomObject]@{
-    Raw        = $raw
-    CreatedDate = if ($PSBoundParameters.DateOnAdd)
-    { [datetime]$date 
+  $raw = ""
+
+  if ($Priority)
+  {
+    $raw += "($Priority) "
+  }
+
+  if ($dateOnAdd)
+  {
+    $raw += "$(Get-Date -Format yyyy-MM-dd) "
+  }
+
+  $raw += $Text.Trim()
+
+  $lines = @()
+  $lines += $raw
+  Add-Content -Path $taskFile -Value $lines
+
+  $lineCount = (Get-Content -Path $taskFile).Count
+
+  [PSCustomObject]@{
+    Raw         = $raw
+    CreatedDate = if ($dateOnAdd)
+    { Get-Date -Format yyyy-MM-dd 
     } else
     { $null 
     }
+    LineNumber  = $lineCount
+    FilePath    = $taskFile
   }
-
-  # Validate
-  if (-not (Confirm-TodoTask -Task $task))
-  {
-    Write-Error "Task validation failed."
-    return
-  }
-
-  # Read current tasks
-  $lines = Read-TodoFile -Path $todoPath
-
-  # Append new task
-  $lines += $raw
-
-  # Write back
-  Write-TodoFile -Path $todoPath -Lines $lines
-
-  # Determine line number
-  $lineNumber = $lines.Count
-
-  # Logging
-  New-ToDoLogMessage -Message "Added task to line $lineNumber\: $raw" -Level Info
-
-  # Output structured task object
-  $task | Add-Member -NotePropertyName LineNumber -NotePropertyValue $lineNumber -Force
-  $task | Add-Member -NotePropertyName FilePath -NotePropertyValue $todoPath -Force
-
-  return $task
 }
 
-Export-ModuleMember -Function Add-ToDo
