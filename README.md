@@ -14,9 +14,11 @@ plain-text format.
 * Full compatibility with the `todo.txt` file format
 * Modular, extensible, and PowerShell-native design
 * Automatic date stamping on added tasks
-* Configurable settings via `Get-ModuleSetting` (and soon `Set-ModuleSetting`)
-* Customizable file paths via environment variables or configuration
-* Seamless integration with scripts, aliases, and Git workflows
+* Runtime configuration engine (Get/Set-ModuleSetting)
+* Config file initialization and loading
+* Centralized environment variable setup with `Set-TodoDirectory`
+* CRUD functionality: add, complete, delete, update, and read tasks
+* Task filtering via `Get-Todo` (priority, context, project, completed)
 
 ---
 
@@ -44,29 +46,45 @@ Add-Todo -Text "Read the todo.txt spec" -Priority A
 Adds a new task to your configured `todo.txt` file. If `DateOnAdd` is enabled,
 the task is prepended with today’s date.
 
-### ⚙️ Configure a Setting
+### ✅ Complete a Task
+```powershell
+Complete-Todo -LineNumber 3
+```
 
+### ❌ Delete a Task
+```powershell
+Remove-Todo -LineNumber 2
+```
+
+### 📝 Update a Task
+```powershell
+Update-Todo -LineNumber 1 -Text "Call mom @phone +Family" -Priority B
+```
+
+### 📋 View Tasks
+```powershell
+Get-Todo -Priority A -Project Work -Incomplete
+```
+
+### ⚙️ Runtime Configuration
 ```powershell
 Set-ModuleSetting -Name 'BackupOnWrite' -Value $false
 ```
 
-Overrides a runtime setting.
-
-### 🔄 Load Settings from File
-
+### 🗂 Load from Config
 ```powershell
 Load-SettingsFromFile -Path "$env:TODO_DIR\config.json"
 ```
 
-Loads your personal or team config from disk.
-
 ### 🆕 Initialize Default Config
-
 ```powershell
 Initialize-TodoConfig -Force
 ```
 
-Writes a default JSON config template at the target location.
+### 🌍 Set Default ToDo Directory as Environment Variable
+```powershell
+Set-TodoDirectory -Path "$HOME\.todo"
+```
 
 ---
 
@@ -78,13 +96,39 @@ Use `Get-ModuleSetting` to retrieve module settings:
 Get-ModuleSetting -Name 'DateOnAdd'
 ```
 
+### ⚙️ Runtime Configuration
+```powershell
+Set-ModuleSetting -Name 'BackupOnWrite' -Value $false
+```
+
+### 🗂 Load from Config
+```powershell
+Load-SettingsFromFile -Path "$env:TODO_DIR\config.json"
+```
+
+### 🆕 Initialize Default Config
+```powershell
+Initialize-TodoConfig -Force
+```
+
+### 🌍 Set Environment Variable
+```powershell
+Set-TodoDirectory -Path "$HOME\.todo"
+```
+
 ### Default Settings
 
 * `DateOnAdd`: Whether to prepend a creation date to new tasks
+* `DefaultPriority`: Optional default priority value
 * `TaskFilePath`: Path to the main todo.txt file
 * `DoneFilePath`: Path to archive completed tasks
+* `ReportFilePath`: Output path for reports
 * `BackupOnWrite`: Whether to write a `.bak` file before saving
-* `ArchiveOnComplete`: Whether completed tasks are moved to `done.txt`
+* `ArchiveOnComplete`: Whether completed tasks move to `done.txt`
+* `UseColorOutput`: Whether to use ANSI color for output
+* `AllowEmptyTaskText`: Allow tasks with no text (for testing)
+* `TrimWhitespace`: Clean up leading/trailing spaces
+* `EnableProjectIndex`: Enable +project/@context tagging
 
 These defaults can be overridden in a future release via `Set-ModuleSetting`,
 environment variables, or a config file.
@@ -115,11 +159,14 @@ ToDoPosh/
 * [x] Runtime configuration engine (`Get/Set-ModuleSetting`)
 * [x] JSON-based config load/save (`Load-SettingsFromFile`, `Initialize-TodoConfig`)
 * [x] Read todo.txt into objects (`Read-ToDoFile`)
-* [ ] Write todo.txt safely (`Write-ToDoFile`)
-* [ ] Complete/Delete/Update tasks
+* [x] Write todo.txt safely (`Write-ToDoFile`)
+* [x] Complete/Delete/Update tasks
 * [ ] Publish to Powershell Gallery
-* [ ] Search, sort, group, and report tasks
-* [ ] Tab completion, profile helpers, and aliases
+* [ ] Task reporting (`Write-TodoReport` or `Export-TodoReport`)
+* [ ] Sorting and grouping logic in `Get-Todo` (e.g., by project, priority)
+* [ ] CLI experience enhancements (tab completion, argument inference)
+* [ ] First-run wizard or installer for bootstrapping user environment
+* [ ] Dynamic reconfiguration of `TODO_DIR` through settings
 
 ---
 

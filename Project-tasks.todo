@@ -1,0 +1,23 @@
+(A) Complete documentation in README.md +ToDoPosh @docs
+(B) Add reporting function Export-TodoReport +Reporting @feature
+(C) Add sorting to Get-Todo by priority, project, context +GetTodo @enhancement
+(C) Add grouping support to Get-Todo output +GetTodo @enhancement
+(D) Build CLI shell wrapper or alias layer +UX @cli
+(D) Add first-run initialization wizard +UX @setup
+(D) Refactor config to support relative paths and TODO_DIR inheritance +Settings @config
+(E) Add support for task due dates and filters +feature @extension
+(E) Enhance Write-TodoFile to support dry run mode +debug @dev
+(E) Add config versioning and migration logic +Settings @config
+(E) Add colorized output and formatting options +UI @terminal
+(E) Publish module to PowerShell Gallery +release @publish
+(F) Write full test suite with Pester +test @qa
+(F) Add Markdown doc generation from comment-based help +docs @automation
+(F) Implement CI pipeline with basic linting +ci @automation
+(F) Add changelog generation +release @automation
+
+x 2025-06-17 (A) Add task (`Add-Todo`) +Core @task
+x 2025-06-17 (A) Runtime configuration engine (`Get/Set-ModuleSetting`) +Core @config
+x 2025-06-17 (B) JSON-based config load/save (`Load-SettingsFromFile`, `Initialize-TodoConfig`) +Core @config
+x 2025-06-17 (B) Read todo.txt into objects (`Read-ToDoFile`) +Core @engine
+x 2025-06-17 (B) Write todo.txt safely (`Write-ToDoFile`) +Core @engine
+x 2025-06-17 (B) Complete/Delete/Update tasks +Core @task
