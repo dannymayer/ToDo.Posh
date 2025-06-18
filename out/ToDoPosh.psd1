@@ -72,6 +72,7 @@ Description = 'An implementation of the todo.txt cli, written in powershell.'
     FunctionsToExport = @(
         'Add-ToDo'
         'Complete-ToDo'
+        'Get-ToDo'
         'Import-ConfigSettings'
         'Initialize-ToDoConfig'
         'Remove-ToDo'
